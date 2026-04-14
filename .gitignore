@@ -45,3 +45,5 @@ third_party/curl
 third_party/lvgl
 
 build
+
+logs/
