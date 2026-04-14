@@ -39,3 +39,9 @@
 
 # debug information files
 *.dwo
+
+third_party/cjson
+third_party/curl
+third_party/lvgl
+
+build
