@@ -282,7 +282,7 @@ void HomeScreen::build() {
     lv_label_set_text(long_notes, long_notes_text.c_str());
     SetBodyLabelStyle(long_notes, lv_color_hex(0x44403C));
 
-    system::Logger::Info("ui.home", "Built home screen with LVGL 9.2.0 widgets");
+    system::Logger::Info("ui.home", "Built home screen with LVGL 9.1.0 widgets");
 #else
     built_ = true;
     system::Logger::Warn("ui.home", "LVGL is unavailable; using placeholder home screen");

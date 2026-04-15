@@ -458,8 +458,8 @@ common::Result Application::start() {
     return ui_app_.start(config_center_.get(kConfigKeyUiStartScreen, "home"));
 }
 
-void Application::tick() {
-    ui_app_.tick();
+uint32_t Application::tick() {
+    return ui_app_.tick();
 }
 
 }  // namespace hmi_nexus::app

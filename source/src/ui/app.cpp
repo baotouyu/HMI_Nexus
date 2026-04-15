@@ -26,9 +26,9 @@ common::Result App::start(const std::string& initial_screen_id) {
     return screen_manager_.show(initial_screen_id.empty() ? "home" : initial_screen_id);
 }
 
-void App::tick() {
+uint32_t App::tick() {
     ui_dispatcher_.drain();
-    lvgl_port_.pump();
+    return lvgl_port_.pump();
 }
 
 }  // namespace hmi_nexus::ui

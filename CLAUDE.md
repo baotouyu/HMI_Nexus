@@ -111,7 +111,7 @@ Tag-based log filtering: `log.tag.net=warn` applies to all `net.*` tags; `log.ta
 
 | Library | Status | Location |
 |---------|--------|----------|
-| LVGL 9.2.0 | Integrated, headless backend (no real display/input yet) | `third_party/lvgl/`, config in `config/lvgl/lv_conf.h` |
+| LVGL 9.1.0 | Integrated, headless backend (no real display/input yet) | `third_party/lvgl/`, config in `config/lvgl/lv_conf.h` |
 | cJSON 1.7.19 | Vendored, requires `-DHMI_NEXUS_ENABLE_CJSON=ON` | `third_party/cjson/` |
 | libcurl 8.19.0 | Vendored from `dl/`, requires `-DHMI_NEXUS_ENABLE_CURL=ON -DHMI_NEXUS_USE_VENDORED_CURL=ON`; falls back to system curl or OpenSSL < 3 | `third_party/curl/` |
 | libmosquitto | Placeholder implementation (log-only) | — |

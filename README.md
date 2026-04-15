@@ -1,6 +1,6 @@
 # HMI_Nexus
 
-`HMI_Nexus` 是一个面向 `Linux` 的轻量级 C++ HMI 框架骨架，核心 UI 方向是 `LVGL`。当前已经接入 `LVGL 9.2.0 core`、页面管理、业务服务、网络接口、事件分发、JSON 封装和 Linux 运行时边界；其中 UI 已经可以真实创建 `LVGL` 控件树，但显示/输入后端目前仍是 `headless` 形态。
+`HMI_Nexus` 是一个面向 `Linux` 的轻量级 C++ HMI 框架骨架，核心 UI 方向是 `LVGL`。当前已经接入 `LVGL 9.1.0 core`、页面管理、业务服务、网络接口、事件分发、JSON 封装和 Linux 运行时边界；其中 UI 已经可以真实创建 `LVGL` 控件树，但显示/输入后端目前仍是 `headless` 形态。
 
 这份 README 不只是目录说明，而是按当前真实代码来深度解释：
 
@@ -278,7 +278,7 @@ Application::start()
 
 当前真实状态：
 
-- `LvglPort` 已接入 `LVGL 9.2.0`
+- `LvglPort` 已接入 `LVGL 9.1.0`
 - 已完成 `lv_init()`、`lv_display_create()`、主题初始化和 `lv_timer_handler()` 驱动
 - `HomeScreen` 已真实创建 `LVGL` 控件，而不是只打 placeholder 日志
 - 当前显示后端还是 headless dummy flush，适合先把 UI 架构、页面对象树和事件流跑通
@@ -920,7 +920,7 @@ third_party/  -> 存正式接入的源码
 - `UiDispatcher` 这个方向是对的
 - 第三方库替换空间已经预留
 - `config` 里的差异化配置入口已经有了
-- `LVGL 9.2.0 core` 已经正式接入，页面骨架能真实创建对象树
+- `LVGL 9.1.0 core` 已经正式接入，页面骨架能真实创建对象树
 
 ### 不足
 

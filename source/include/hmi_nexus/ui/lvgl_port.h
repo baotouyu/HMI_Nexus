@@ -74,7 +74,7 @@ public:
 
     common::Result initialize();
     common::Result applyTheme(const std::string& theme_name);
-    void pump();
+    uint32_t pump();
     bool initialized() const;
 
 private:

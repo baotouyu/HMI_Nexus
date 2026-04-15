@@ -9,18 +9,8 @@
 #include <dma_allocator.h>
 #include <mpp_ge.h>
 
-#include "lvgl.h"
 #include "source/src/ui/lvgl/d211/d211_lvgl_fake_image.h"
-#include "third_party/lvgl/src/core/lv_global.h"
-#include "third_party/lvgl/src/draw/lv_draw_buf_private.h"
-#include "third_party/lvgl/src/draw/lv_draw_image_private.h"
-#include "third_party/lvgl/src/draw/lv_draw_label_private.h"
-#include "third_party/lvgl/src/draw/lv_image_decoder_private.h"
-#include "third_party/lvgl/src/draw/lv_draw_private.h"
-#include "third_party/lvgl/src/draw/sw/lv_draw_sw.h"
-#include "third_party/lvgl/src/draw/sw/blend/lv_draw_sw_blend_private.h"
-#include "third_party/lvgl/src/draw/sw/lv_draw_sw_mask_private.h"
-#include "third_party/lvgl/src/misc/lv_area_private.h"
+#include "source/src/ui/lvgl/lvgl_private_compat.h"
 
 #define HMI_NEXUS_D211_DRAW_UNIT_ID 10
 #define HMI_NEXUS_D211_GE2D_IMAGE_BLIT_SIZE_LIMIT (100 * 100)
@@ -286,6 +276,7 @@ static void draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_a
     }
 }
 
+#if HMI_NEXUS_LVGL_HAS_DRAW_BUF_FLUSH_CACHE_CB
 static void draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     hmi_nexus_d211_ge2d_buffer_entry_t * entry;
@@ -308,6 +299,7 @@ static void draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t
         g_state.original_handlers.flush_cache_cb(draw_buf, area);
     }
 }
+#endif
 
 static uint32_t draw_buf_width_to_stride(uint32_t width, lv_color_format_t color_format)
 {
@@ -685,7 +677,7 @@ static bool image_descriptor_base_supported(const lv_draw_image_dsc_t * draw_dsc
     if(draw_dsc->recolor_opa > LV_OPA_MIN) {
         return false;
     }
-    if(draw_dsc->clip_radius != 0) {
+    if(hmi_nexus_lvgl_draw_image_has_clip_radius(draw_dsc)) {
         return false;
     }
     if(draw_dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
@@ -899,11 +891,12 @@ static lv_draw_buf_t * duplicate_rgb565a8_to_argb8888_dma(const lv_draw_buf_t * 
         return NULL;
     }
 
-    dma_draw_buf = lv_draw_buf_create_ex(&LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers,
-                                         source_draw_buf->header.w,
-                                         source_draw_buf->header.h,
-                                         LV_COLOR_FORMAT_ARGB8888,
-                                         LV_STRIDE_AUTO);
+    dma_draw_buf = hmi_nexus_lvgl_draw_buf_create_with_handlers(
+        hmi_nexus_lvgl_image_cache_draw_buf_handlers(),
+        source_draw_buf->header.w,
+        source_draw_buf->header.h,
+        LV_COLOR_FORMAT_ARGB8888,
+        LV_STRIDE_AUTO);
     if(dma_draw_buf == NULL || dma_draw_buf->data == NULL) {
         if(dma_draw_buf != NULL) {
             lv_draw_buf_destroy(dma_draw_buf);
@@ -976,7 +969,8 @@ static const lv_draw_buf_t * ensure_hw_source_draw_buf(const void * source_key,
         dma_draw_buf = duplicate_rgb565a8_to_argb8888_dma(draw_buf);
     }
     else {
-        dma_draw_buf = lv_draw_buf_dup_ex(&LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers, draw_buf);
+        dma_draw_buf = hmi_nexus_lvgl_draw_buf_dup_with_handlers(
+            hmi_nexus_lvgl_image_cache_draw_buf_handlers(), draw_buf);
     }
     if(dma_draw_buf == NULL || !source_draw_buf_supported(dma_draw_buf)) {
         if(dma_draw_buf != NULL) {
@@ -2964,10 +2958,12 @@ void hmi_nexus_d211_lvgl_ge2d_init(void)
     g_state.image_cache_handlers.buf_free_cb = draw_buf_free;
     g_state.image_cache_handlers.align_pointer_cb = draw_buf_align;
     g_state.image_cache_handlers.invalidate_cache_cb = draw_buf_invalidate_cache;
+#if HMI_NEXUS_LVGL_HAS_DRAW_BUF_FLUSH_CACHE_CB
     g_state.image_cache_handlers.flush_cache_cb = draw_buf_flush_cache;
+#endif
     g_state.image_cache_handlers.width_to_stride_cb = draw_buf_width_to_stride;
     g_state.handlers_installed = true;
-    LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers = g_state.image_cache_handlers;
+    hmi_nexus_lvgl_install_image_cache_draw_buf_handlers(&g_state.image_cache_handlers);
 
     unit = lv_draw_create_unit(sizeof(*unit));
     if(unit == NULL) {

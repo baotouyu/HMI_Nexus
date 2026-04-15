@@ -28,8 +28,8 @@ int main() {
     }
 
     while (g_running.load()) {
-        application.tick();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        const uint32_t delay_ms = application.tick();
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
     }
 
     return 0;

@@ -11,14 +11,7 @@
 
 #include <g2d_driver_enh.h>
 #include <ion_mem_alloc.h>
-#include "lvgl.h"
-#include "third_party/lvgl/src/core/lv_global.h"
-#include "third_party/lvgl/src/draw/lv_draw_buf_private.h"
-#include "third_party/lvgl/src/draw/lv_draw_image_private.h"
-#include "third_party/lvgl/src/draw/lv_image_decoder_private.h"
-#include "third_party/lvgl/src/misc/lv_area_private.h"
-#include "third_party/lvgl/src/draw/lv_draw_private.h"
-#include "third_party/lvgl/src/draw/sw/lv_draw_sw.h"
+#include "source/src/ui/lvgl/lvgl_private_compat.h"
 
 #define HMI_NEXUS_F133_DRAW_UNIT_ID 11
 #define HMI_NEXUS_F133_G2D_IMAGE_CACHE_LIMIT 8U
@@ -334,6 +327,7 @@ static void draw_buf_invalidate_cache(const lv_draw_buf_t * draw_buf, const lv_a
     }
 }
 
+#if HMI_NEXUS_LVGL_HAS_DRAW_BUF_FLUSH_CACHE_CB
 static void draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t * area)
 {
     hmi_nexus_f133_g2d_buffer_entry_t * entry;
@@ -354,6 +348,7 @@ static void draw_buf_flush_cache(const lv_draw_buf_t * draw_buf, const lv_area_t
         g_state.original_handlers.flush_cache_cb(draw_buf, area);
     }
 }
+#endif
 
 static uint32_t draw_buf_width_to_stride(uint32_t width, lv_color_format_t color_format)
 {
@@ -498,7 +493,7 @@ static bool image_descriptor_can_use_hw(const lv_draw_image_dsc_t * draw_dsc)
 
     if(draw_dsc->bitmap_mask_src != NULL ||
        draw_dsc->recolor_opa > LV_OPA_MIN ||
-       draw_dsc->clip_radius != 0 ||
+       hmi_nexus_lvgl_draw_image_has_clip_radius(draw_dsc) ||
        draw_dsc->blend_mode != LV_BLEND_MODE_NORMAL) {
         return false;
     }
@@ -542,7 +537,7 @@ static lv_draw_buf_t * duplicate_hw_source_draw_buf(const lv_draw_buf_t * draw_b
         return NULL;
     }
 
-    dma_draw_buf = lv_draw_buf_dup_ex(&g_state.image_cache_handlers, draw_buf);
+    dma_draw_buf = hmi_nexus_lvgl_draw_buf_dup_with_handlers(&g_state.image_cache_handlers, draw_buf);
     if(dma_draw_buf == NULL || !source_draw_buf_supported(dma_draw_buf)) {
         if(dma_draw_buf != NULL) {
             lv_draw_buf_destroy(dma_draw_buf);
@@ -1180,9 +1175,11 @@ void hmi_nexus_f133_lvgl_g2d_init(void)
     g_state.image_cache_handlers.buf_free_cb = draw_buf_free;
     g_state.image_cache_handlers.align_pointer_cb = draw_buf_align;
     g_state.image_cache_handlers.invalidate_cache_cb = draw_buf_invalidate_cache;
+#if HMI_NEXUS_LVGL_HAS_DRAW_BUF_FLUSH_CACHE_CB
     g_state.image_cache_handlers.flush_cache_cb = draw_buf_flush_cache;
+#endif
     g_state.image_cache_handlers.width_to_stride_cb = draw_buf_width_to_stride;
-    LV_GLOBAL_DEFAULT()->image_cache_draw_buf_handlers = g_state.image_cache_handlers;
+    hmi_nexus_lvgl_install_image_cache_draw_buf_handlers(&g_state.image_cache_handlers);
 
     unit = lv_draw_create_unit(sizeof(*unit));
     if(unit == NULL) {

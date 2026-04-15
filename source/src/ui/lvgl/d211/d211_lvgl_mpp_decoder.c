@@ -12,11 +12,9 @@
 #include <frame_allocator.h>
 #include <mpp_decoder.h>
 
-#include "lvgl.h"
 #include "source/src/ui/lvgl/d211/d211_lvgl_fake_image.h"
 #include "source/src/ui/lvgl/d211/d211_lvgl_ge2d.h"
-#include "third_party/lvgl/src/core/lv_global.h"
-#include "third_party/lvgl/src/draw/lv_image_decoder_private.h"
+#include "source/src/ui/lvgl/lvgl_private_compat.h"
 #include "third_party/lvgl/src/misc/cache/lv_cache.h"
 
 #ifdef LV_CACHE_IMG_NUM
@@ -616,12 +614,9 @@ static lv_result_t ReadJpegInfo(const lv_image_decoder_dsc_t * dsc,
     }
 }
 
-static lv_result_t D211MppDecoderInfo(lv_image_decoder_t * decoder,
-                                      lv_image_decoder_dsc_t * dsc,
-                                      lv_image_header_t * header)
+static lv_result_t D211MppDecoderReadInfo(const lv_image_decoder_dsc_t * dsc,
+                                          lv_image_header_t * header)
 {
-    LV_UNUSED(decoder);
-
     if(dsc == NULL || header == NULL || dsc->src == NULL) {
         return LV_RESULT_INVALID;
     }
@@ -655,6 +650,34 @@ static lv_result_t D211MppDecoderInfo(lv_image_decoder_t * decoder,
 
     return LV_RESULT_INVALID;
 }
+
+#if LV_VERSION_CHECK(9, 2, 0)
+static lv_result_t D211MppDecoderInfo(lv_image_decoder_t * decoder,
+                                      lv_image_decoder_dsc_t * dsc,
+                                      lv_image_header_t * header)
+{
+    LV_UNUSED(decoder);
+    return D211MppDecoderReadInfo(dsc, header);
+}
+#else
+static lv_result_t D211MppDecoderInfo(lv_image_decoder_t * decoder,
+                                      const void * src,
+                                      lv_image_header_t * header)
+{
+    lv_image_decoder_dsc_t dsc;
+
+    LV_UNUSED(decoder);
+
+    if(src == NULL) {
+        return LV_RESULT_INVALID;
+    }
+
+    memset(&dsc, 0, sizeof(dsc));
+    dsc.src = src;
+    dsc.src_type = lv_image_src_get_type(src);
+    return D211MppDecoderReadInfo(&dsc, header);
+}
+#endif
 
 static int ComputeFramePlaneSizes(struct mpp_buf * buffer, int plane_sizes[3])
 {
@@ -843,8 +866,6 @@ static lv_result_t AllocateDecodedImageBuffers(hmi_nexus_d211_lvgl_mpp_decoded_i
         image->draw_buf.data = image->planes[0];
         image->draw_buf.unaligned_data = image->planes[0];
     }
-    image->draw_buf.handlers = NULL;
-
     return LV_RESULT_OK;
 }
 

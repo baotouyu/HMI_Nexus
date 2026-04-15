@@ -16,7 +16,7 @@ public:
         LvglPort& lvgl_port);
 
     common::Result start(const std::string& initial_screen_id = "home");
-    void tick();
+    uint32_t tick();
 
 private:
     ScreenManager& screen_manager_;

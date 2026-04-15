@@ -762,7 +762,7 @@ common::Result LvglPort::initializeLvglDisplay() {
     }
 
     system::Logger::Info("ui.lvgl",
-                         "LVGL 9.2.0 initialized: " + std::to_string(surface.width) + "x" +
+                         "LVGL 9.1.0 initialized: " + std::to_string(surface.width) + "x" +
                              std::to_string(surface.height) + ", render=" +
                              PixelFormatName(primary.pixel_format) + ", scanout=" +
                              PixelFormatName(surface.pixel_format) + ", rotation=" +
@@ -811,10 +811,10 @@ common::Result LvglPort::applyTheme(const std::string& theme_name) {
 #endif
 }
 
-void LvglPort::pump() {
+uint32_t LvglPort::pump() {
 #if HMI_NEXUS_HAS_LVGL
     if (!initialized_) {
-        return;
+        return 1;
     }
 
     const auto now = std::chrono::steady_clock::now();
@@ -826,7 +826,7 @@ void LvglPort::pump() {
     }
 
     const auto handler_start = std::chrono::steady_clock::now();
-    lv_timer_handler();
+    const uint32_t delay = lv_timer_handler();
     const auto handler_end = std::chrono::steady_clock::now();
 
     if (config_.perf_stats_enabled) {
@@ -845,6 +845,9 @@ void LvglPort::pump() {
 
     MaybeReportGe2DStats(this, handler_end);
     MaybeReportSunxiG2DStats(this, handler_end);
+    return delay;
+#else
+    return 1;
 #endif
 }
 

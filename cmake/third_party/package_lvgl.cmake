@@ -7,7 +7,7 @@ option(HMI_NEXUS_USE_VENDORED_LVGL
     ON)
 set(HMI_NEXUS_LVGL_DIR "${CMAKE_SOURCE_DIR}/third_party/lvgl" CACHE PATH
     "Path to vendored LVGL source")
-set(HMI_NEXUS_LVGL_ARCHIVE "${CMAKE_SOURCE_DIR}/dl/lvgl-9.2.0.tar.gz" CACHE FILEPATH
+set(HMI_NEXUS_LVGL_ARCHIVE "${CMAKE_SOURCE_DIR}/dl/lvgl-9.1.0.tar.gz" CACHE FILEPATH
     "Path to local LVGL source archive")
 set(HMI_NEXUS_LVGL_CONF "${CMAKE_SOURCE_DIR}/config/lvgl/lv_conf.h" CACHE FILEPATH
     "Path to LVGL configuration header")

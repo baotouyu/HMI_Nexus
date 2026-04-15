@@ -25,7 +25,7 @@ public:
     Application();
 
     common::Result start();
-    void tick();
+    uint32_t tick();
 
 private:
     device::Runtime runtime_;

@@ -21,6 +21,6 @@ third_party/
 当前已预留：
 - `third_party/cjson/`：JSON 解析库放置位置
 - `third_party/curl/`：libcurl 源码放置位置，可由 `dl/curl-curl-8_19_0.tar.gz` 自动解压生成
-- `third_party/lvgl/`：LVGL 源码放置位置，可由 `dl/lvgl-9.2.0.tar.gz` 自动解压生成
+- `third_party/lvgl/`：LVGL 源码放置位置，可由 `dl/lvgl-9.1.0.tar.gz` 自动解压生成
 
 如果后续引入新的外部库，也建议继续按这个模式扩展。

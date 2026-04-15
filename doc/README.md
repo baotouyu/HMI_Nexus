@@ -7,7 +7,7 @@
 - `doc/http_api.md`：`HttpClient` 的 HTTP/HTTPS 请求、异步封装、TLS 配置和下载能力
 - `doc/async_design.md`：异步线程模型、UI 回调链路和线程安全边界说明
 - `doc/wifi_api.md`：`WiFiManager` 的扫描、连接、DHCP 和板端启动链路
-- `doc/lvgl_ui.md`：`LVGL 9.2.0` 接入方式、`LvglPort` 职责和当前 headless UI 状态
+- `doc/lvgl_ui.md`：`LVGL 9.1.0` 接入方式、`LvglPort` 职责和当前 headless UI 状态
 
 建议阅读顺序：
 

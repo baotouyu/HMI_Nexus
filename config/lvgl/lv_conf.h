@@ -2,7 +2,7 @@
 #define LV_CONF_H
 
 /*
- * Minimal LVGL 9.2.0 configuration for the current Linux HMI skeleton.
+ * Minimal LVGL 9.1.0 configuration for the current Linux HMI skeleton.
  * Keep this file intentionally small and override only the options we rely on.
  */
 
